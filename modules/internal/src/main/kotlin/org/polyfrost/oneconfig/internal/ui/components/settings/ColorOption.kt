@@ -748,13 +748,35 @@ internal fun ColorPickerPopup(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                var gradientPickerOpen by remember { mutableStateOf(false) }
                 Box(
                     modifier = Modifier
                         .size(24.dp)
                         .clip(LocalTheme.current.shapes.field)
                         .background(model.gradientColor)
                         .border(1.dp, theme.borderColor, LocalTheme.current.shapes.field)
+                        .oneConfigClickable(
+                            label = translated("oneconfig.colour.gradient.picker", "Gradient colour picker"),
+                            onClick = { gradientPickerOpen = true },
+                            shape = LocalTheme.current.shapes.field,
+                            indication = false,
+                        )
                 )
+                if (gradientPickerOpen) {
+                    val gradientModel = remember(model) { ColorPickerModel(model.gradientColor) }
+                    KitColorPickerPopup(
+                        gradientModel,
+                        onColorChanged = { c ->
+                            model.gradientColor = c
+                            gradientText = colorToHex(c)
+                            save()
+                        },
+                        onDismiss = { gradientPickerOpen = false },
+                        placement = Placement.BelowStart,
+                        chromaCapable = false,
+                        gradientCapable = false,
+                    )
+                }
                 PickerTextField(
                     gradientText,
                     { input ->
